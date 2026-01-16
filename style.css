@@ -1,4 +1,4 @@
-/* Global box-sizing */
+/* Global */
 *,
 *::before,
 *::after {
@@ -11,6 +11,34 @@ body {
   background: #f5f6f8;
 }
 
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  margin: 24px 0 12px 0;
+  font-weight: 600;
+  color: #111;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+h4 {
+  font-size: 1.1rem;
+}
+
+h5, h6 {
+  font-size: 1rem;
+}
+
 /* Toolbar */
 .toolbar {
   width: 100%;
@@ -18,9 +46,31 @@ body {
   padding: 0 24px;
   display: flex;
   align-items: center;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #ddd;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  transition: color 0.2s;
+}
+
+.sidebar-toggle:hover {
+  color: #007aff;
+}
+
+.toolbar h1 {
+  margin: 0;
+  font-size: 2rem;
 }
 
 /* Layout */
@@ -32,9 +82,9 @@ body {
 /* Sidebar */
 .sidebar {
   position: relative;
-  width: 500px;
-  min-width: 500px;
-  max-width: 550px;
+  width: 325px;
+  min-width: 300px;
+  max-width: 350;
   background: #ffffff;
   padding: 12px;
   border-right: 1px solid #ddd;
@@ -51,6 +101,8 @@ body {
   border-radius: 9px;
   font-weight: normal;
   margin: 6px 10px;
+  cursor: pointer; /* <- important for hover */
+  transition: background 0.2s;
 }
 
 .sidebar nav a:hover {
@@ -85,4 +137,58 @@ body {
 
 .spacer {
   height: 1000px;
+}
+
+/* Code block container */
+.code-block {
+  margin: 24px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e1e4e8;
+}
+
+/* Toolbar */
+.code-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #d0d7de;
+}
+
+/* Language label */
+.code-lang {
+  font-weight: 600;
+  color: #444;
+  text-transform: lowercase;
+}
+
+/* Copy button */
+.copy-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #007aff;
+  padding: 4px 6px;
+}
+
+.copy-btn:hover {
+  text-decoration: underline;
+}
+
+/* Code area */
+.code-block pre {
+  margin: 0;
+  padding: 14px;
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.code-block code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  color: #24292e;
 }
