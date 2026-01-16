@@ -5,17 +5,51 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* Light mode (default) */
+  --bg-primary: #f5f6f8;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #ffffff;
+  --text-primary: #111;
+  --text-secondary: #444;
+  --border-color: #ddd;
+  --border-subtle: #e1e4e8;
+  --border-code: #d0d7de;
+  --hover-bg: #d6e2f8;
+  --accent-color: #007aff;
+  --link-color: #007aff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode - sidebar and code blocks match toolbar */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #0d0d0d;
+    --bg-tertiary: #1a1a1a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --border-color: #2a2a2a;
+    --border-subtle: #2a2a2a;
+    --border-code: #2a2a2a;
+    --hover-bg: #2a2a2a;
+    --accent-color: #5b9ef5;
+    --link-color: #007aff;
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  background: #f5f6f8;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
   margin: 24px 0 12px 0;
   font-weight: 600;
-  color: #111;
+  color: var(--text-primary);
 }
 
 h1 {
@@ -39,6 +73,16 @@ h5, h6 {
   font-size: 1rem;
 }
 
+/* Links - same color in light and dark mode */
+a {
+  color: #007aff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 /* Toolbar */
 .toolbar {
   width: 100%;
@@ -49,7 +93,13 @@ h5, h6 {
   gap: 12px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .toolbar {
+    background: rgba(26, 26, 26, 0.8);
+  }
 }
 
 .sidebar-toggle {
@@ -60,17 +110,17 @@ h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333;
+  color: var(--text-secondary);
   transition: color 0.2s;
 }
 
 .sidebar-toggle:hover {
-  color: #007aff;
+  color: var(--accent-color);
 }
 
 .toolbar h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 /* Layout */
@@ -85,9 +135,9 @@ h5, h6 {
   width: 325px;
   min-width: 300px;
   max-width: 350;
-  background: #ffffff;
+  background: var(--bg-tertiary);
   padding: 12px;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--border-color);
   overflow: auto;
   z-index: 1;
 }
@@ -96,23 +146,23 @@ h5, h6 {
 .sidebar nav a {
   display: block;
   text-decoration: none;
-  color: #111;
+  color: var(--text-primary);
   padding: 9px 15px;
   border-radius: 9px;
   font-weight: normal;
   margin: 6px 10px;
-  cursor: pointer; /* <- important for hover */
+  cursor: pointer;
   transition: background 0.2s;
 }
 
 .sidebar nav a:hover {
-  background: #d6e2f8;
-  color: #111;
+  background: var(--hover-bg);
+  color: var(--text-primary);
 }
 
 .sidebar nav a.selected {
-  background: #d6e2f8;
-  color: #111;
+  background: var(--hover-bg);
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -131,7 +181,7 @@ h5, h6 {
 .content {
   flex: 1;
   padding: 12px 32px;
-  background: #f9fafb;
+  background: var(--bg-secondary);
   overflow: auto;
 }
 
@@ -144,8 +194,8 @@ h5, h6 {
   margin: 24px 0;
   border-radius: 10px;
   overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e1e4e8;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
 }
 
 /* Toolbar */
@@ -155,13 +205,13 @@ h5, h6 {
   align-items: center;
   padding: 6px 12px;
   font-size: 0.85rem;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--border-code);
 }
 
 /* Language label */
 .code-lang {
   font-weight: 600;
-  color: #444;
+  color: var(--text-secondary);
   text-transform: lowercase;
 }
 
@@ -171,7 +221,7 @@ h5, h6 {
   background: none;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #007aff;
+  color: var(--accent-color);
   padding: 4px 6px;
 }
 
@@ -184,11 +234,11 @@ h5, h6 {
   margin: 0;
   padding: 14px;
   overflow-x: auto;
-  background: #ffffff;
+  background: var(--bg-tertiary);
 }
 
 .code-block code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.9rem;
-  color: #24292e;
+  color: var(--text-primary);
 }
