@@ -6,7 +6,6 @@
 }
 
 :root {
-  /* Light mode (default) */
   --bg-primary: #f5f6f8;
   --bg-secondary: #f9fafb;
   --bg-tertiary: #ffffff;
@@ -22,7 +21,6 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark mode - sidebar and code blocks match toolbar */
     --bg-primary: #1a1a1a;
     --bg-secondary: #0d0d0d;
     --bg-tertiary: #1a1a1a;
@@ -73,7 +71,6 @@ h5, h6 {
   font-size: 1rem;
 }
 
-/* Links - same color in light and dark mode */
 a {
   color: #007aff;
   text-decoration: none;
