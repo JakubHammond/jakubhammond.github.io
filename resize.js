@@ -1,8 +1,8 @@
 const sidebar = document.getElementById("sidebar");
 const resizer = document.getElementById("resizer");
 
-const MIN_WIDTH = 500;
-const MAX_WIDTH = 550;
+const MIN_WIDTH = 300;
+const MAX_WIDTH = 350;
 
 let isResizing = false;
 
@@ -24,14 +24,4 @@ document.addEventListener("mousemove", (e) => {
 document.addEventListener("mouseup", () => {
   isResizing = false;
   document.body.style.cursor = "default";
-});
-
-// Sidebar item selection
-const sidebarItems = document.querySelectorAll('.sidebar-item');
-
-sidebarItems.forEach(item => {
-  item.addEventListener('click', () => {
-    sidebarItems.forEach(i => i.classList.remove('selected'));
-    item.classList.add('selected');
-  });
 });
