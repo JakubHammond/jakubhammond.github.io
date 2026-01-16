@@ -2,29 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Jakub’s Notes</title>
+  <title>Documentation</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Toolbar -->
+  <header class="toolbar">
+    <h1>Documentation</h1>
+  </header>
+
   <div class="layout">
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-      <h2>Notes</h2>
-      <nav>
-        <a href="#">Home</a>
-        <a href="#">SystemVerilog</a>
-        <a href="#">CPU Design</a>
-        <a href="#">Projects</a>
+      <nav id="sidebar-nav" aria-label="Sidebar Navigation">
+        <a href="#" class="sidebar-item selected">Home</a>
+        <a href="#" class="sidebar-item">SystemVerilog</a>
+        <a href="#" class="sidebar-item">CPU Design</a>
+        <a href="#" class="sidebar-item">Projects</a>
       </nav>
       <div class="resizer" id="resizer"></div>
     </aside>
 
+    <!-- Main content -->
     <main class="content">
-      <h1>Welcome</h1>
-      <p>Your documentation lives here.</p>
+      <p>This is Development Documentation & Research.</p>
+      <p>Scroll down to see the content under the toolbar.</p>
+      <div class="spacer"></div>
+      <p>End of content - this is a test</p>
     </main>
   </div>
 
 <script src="resize.js"></script>
+<script src="sidebar.js"></script>
 </body>
 </html>
