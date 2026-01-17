@@ -86,7 +86,7 @@ a:hover {
 .toolbar {
   width: 100%;
   height: 48px;
-  padding: 0 24px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -139,7 +139,8 @@ a:hover {
   flex-shrink: 0;
   height: calc(100vh - 48px);
   position: relative;
-  border-right: 1px solid var(--border-color);
+  border-right: none;
+  box-shadow: 1px 0 0 var(--border-color);
 }
 
 /* Sidebar search */
@@ -149,7 +150,6 @@ a:hover {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Sidebar search Input */
 .sidebar-search input {
   width: 100%;
   padding: 8px 12px;
@@ -279,4 +279,45 @@ a:hover {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.9rem;
   color: var(--text-primary);
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Sidebar toggle hidden state */
+.sidebar.hidden {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .sidebar-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
