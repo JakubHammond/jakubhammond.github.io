@@ -93,20 +93,21 @@ function buildSidebar() {
 document.addEventListener("DOMContentLoaded", () => {
   const sidebarToggle = document.getElementById("sidebar-toggle");
   const sidebar = document.getElementById("sidebar");
-  const icon = document.getElementById("sidebar-icon");
-  const [line1, line2, line3] = icon.querySelectorAll("line");
+  const icon = document.getElementById("sidebar-icon"); // <svg> element
+  let sidebarVisible = true; // sidebar starts open
 
-  let sidebarVisible = true; // sidebar is open by default
+  sidebarToggle.addEventListener("click", () => {
+    sidebarVisible = !sidebarVisible;
+    sidebar.classList.toggle("hidden", !sidebarVisible);
 
-  // Function to update icon based on sidebarVisible
-  function updateSidebarIcon() {
+    const [line1, line2, line3] = icon.querySelectorAll("line");
+
     if (sidebarVisible) {
       // Sidebar OPEN → show X
       line1.setAttribute("x1", "6"); line1.setAttribute("y1", "6");
       line1.setAttribute("x2", "18"); line1.setAttribute("y2", "18");
 
-      line2.setAttribute("x1", "0"); line2.setAttribute("y1", "0");
-      line2.setAttribute("x2", "0"); line2.setAttribute("y2", "0"); // hide middle line
+      line2.style.display = "none"; // hide middle line
 
       line3.setAttribute("x1", "6"); line3.setAttribute("y1", "18");
       line3.setAttribute("x2", "18"); line3.setAttribute("y2", "6");
@@ -115,28 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
       line1.setAttribute("x1", "3"); line1.setAttribute("y1", "6");
       line1.setAttribute("x2", "21"); line1.setAttribute("y2", "6");
 
+      line2.style.display = "block"; // show middle line
       line2.setAttribute("x1", "3"); line2.setAttribute("y1", "12");
       line2.setAttribute("x2", "21"); line2.setAttribute("y2", "12");
 
       line3.setAttribute("x1", "3"); line3.setAttribute("y1", "18");
       line3.setAttribute("x2", "21"); line3.setAttribute("y2", "18");
     }
-  }
-
-  // Run once on page load
-  updateSidebarIcon();
-
-  // Toggle sidebar
-  sidebarToggle.addEventListener("click", () => {
-    sidebarVisible = !sidebarVisible;
-    
-    if (sidebarVisible) {
-      sidebar.classList.remove("hidden");
-    } else {
-      sidebar.classList.add("hidden");
-    }
-
-    updateSidebarIcon();
   });
 });
 
