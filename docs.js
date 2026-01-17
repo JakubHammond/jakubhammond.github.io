@@ -37,7 +37,7 @@ async function preloadDocs() {
       // Remove BOM & normalize line endings
       md = md.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
 
-      // Trim only the last line (avoid removing backticks accidentally)
+      // Trim only the last line
       docsContent[file] = md.replace(/\s+$/g, "");
     } catch (err) {
       console.error(`Failed to preload ${file}:`, err);
@@ -106,3 +106,17 @@ function buildSidebar() {
   const firstItem = sidebarNav.querySelector(".sidebar-item");
   if (firstItem) firstItem.click();
 })();
+
+// --- Sidebar search ---
+const searchInput = document.getElementById("sidebar-search");
+
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase().trim();
+
+    sidebarNav.querySelectorAll(".sidebar-item").forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(query) ? "" : "none";
+    });
+  });
+}
