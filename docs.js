@@ -5,7 +5,7 @@ const content = document.querySelector(".content");
 const docs = [
   "docs/Overview.md",
   "docs/LICENSE",
-  "docs/Code.md",
+  "docs/Example-Code.md",
 ];
 
 // Object to store preloaded content
@@ -18,10 +18,13 @@ if (typeof marked !== 'undefined') {
       const code = token.text || token;
       const lang = token.lang || "text";
 
-      return `<div class="code-block"><div class="code-toolbar"><span class="code-lang">${lang}</span><button class="copy-btn" data-code="${encodeURIComponent(code)}">Copy</button></div><pre><code>${code
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")}</code></pre></div>`;
+      return `<div class="code-block">
+        <div class="code-toolbar">
+          <span class="code-lang">${lang}</span>
+          <button class="copy-btn" data-code="${encodeURIComponent(code)}">Copy</button>
+        </div>
+        <pre><code>${code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+      </div>`;
     }
   };
 
@@ -43,7 +46,7 @@ async function preloadDocs() {
 }
 
 // --- Load a document into the main content ---
-function loadDoc(file, linkEl) {
+function loadDoc(file, linkEl, updateHash = true) {
   const md = docsContent[file];
   if (!md) return;
 
@@ -55,6 +58,7 @@ function loadDoc(file, linkEl) {
       "<pre>" + md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>";
   }
 
+  // Copy buttons
   content.querySelectorAll(".copy-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const code = decodeURIComponent(btn.dataset.code);
@@ -64,8 +68,15 @@ function loadDoc(file, linkEl) {
     });
   });
 
+  // Sidebar selection
   sidebarNav.querySelectorAll(".sidebar-item").forEach(i => i.classList.remove("selected"));
   if (linkEl) linkEl.classList.add("selected");
+
+  // Update URL hash
+  if (updateHash) {
+    const name = file.split("/").pop().replace(".md", "").replace(/\s+/g, "-");
+    window.location.hash = name;
+  }
 }
 
 // --- Build the sidebar dynamically ---
@@ -87,6 +98,22 @@ function buildSidebar() {
 
     sidebarNav.appendChild(a);
   });
+}
+
+// --- Load doc from hash ---
+function loadFromHash() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return false;
+
+  for (const file of docs) {
+    const name = file.split("/").pop().replace(".md", "").replace(/\s+/g, "-");
+    if (name === hash) {
+      const linkEl = Array.from(sidebarNav.children).find(a => a.textContent.replace(/\s+/g, "-") === hash);
+      loadDoc(file, linkEl, false);
+      return true;
+    }
+  }
+  return false;
 }
 
 // --- Sidebar toggle with SVG animation ---
@@ -131,8 +158,11 @@ document.addEventListener("DOMContentLoaded", () => {
   await preloadDocs();
   buildSidebar();
 
-  const firstItem = sidebarNav.querySelector(".sidebar-item");
-  if (firstItem) firstItem.click();
+  // Try loading from hash first
+  if (!loadFromHash()) {
+    const firstItem = sidebarNav.querySelector(".sidebar-item");
+    if (firstItem) firstItem.click();
+  }
 })();
 
 // --- Sidebar search ---
