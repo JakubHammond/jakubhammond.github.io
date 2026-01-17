@@ -14,10 +14,10 @@
   --border-color: #ddd;
   --border-subtle: #e1e4e8;
   --border-code: #d0d7de;
-  --hover-bg: #f5f6f8;
+  --hover-bg: #ffffff;
   --accent-color: #007aff;
   --link-color: #007aff;
-  --sidebar-bg: #ffffff;
+  --sidebar-bg: #f9fafb;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -131,15 +131,53 @@ a:hover {
 
 /* Sidebar */
 .sidebar {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 325px;
   min-width: 300px;
-  max-width: 350;
-  background: var(--sidebar-bg);
-  padding: 12px;
+  max-width: 350px;
+  flex-shrink: 0;
+  height: calc(100vh - 48px);
+  position: relative;
   border-right: 1px solid var(--border-color);
-  overflow: auto;
-  z-index: 1;
+}
+
+/* Sidebar search */
+.sidebar-search {
+  flex-shrink: 0;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Sidebar search Input */
+.sidebar-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.sidebar-search input::placeholder {
+  color: var(--text-secondary);
+}
+
+.sidebar-search input:hover {
+  background: var(--hover-bg);
+}
+
+.sidebar-search input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: var(--bg-tertiary);
+}
+
+#sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* Sidebar items */
