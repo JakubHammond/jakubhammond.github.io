@@ -33,11 +33,7 @@ async function preloadDocs() {
   for (const file of docs) {
     try {
       let md = await fetch(file).then(res => res.text());
-
-      // Remove BOM & normalize line endings
       md = md.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
-
-      // Trim only the last line
       docsContent[file] = md.replace(/\s+$/g, "");
     } catch (err) {
       console.error(`Failed to preload ${file}:`, err);
@@ -51,17 +47,14 @@ function loadDoc(file, linkEl) {
   const md = docsContent[file];
   if (!md) return;
 
-  // Always parse with marked
   try {
     content.innerHTML = marked.parse(md);
   } catch (err) {
     console.warn("Markdown parse failed, showing raw text", err);
-    // fallback: escape HTML
     content.innerHTML =
       "<pre>" + md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>";
   }
 
-  // Copy buttons
   content.querySelectorAll(".copy-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const code = decodeURIComponent(btn.dataset.code);
@@ -71,7 +64,6 @@ function loadDoc(file, linkEl) {
     });
   });
 
-  // Sidebar selection
   sidebarNav.querySelectorAll(".sidebar-item").forEach(i => i.classList.remove("selected"));
   if (linkEl) linkEl.classList.add("selected");
 }
@@ -97,12 +89,62 @@ function buildSidebar() {
   });
 }
 
+// --- Sidebar toggle with SVG animation ---
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebarToggle = document.getElementById("sidebar-toggle");
+  const sidebar = document.getElementById("sidebar");
+  const icon = document.getElementById("sidebar-icon");
+  const [line1, line2, line3] = icon.querySelectorAll("line");
+
+  let sidebarVisible = true; // sidebar is open by default
+
+  // Function to update icon based on sidebarVisible
+  function updateSidebarIcon() {
+    if (sidebarVisible) {
+      // Sidebar OPEN → show X
+      line1.setAttribute("x1", "6"); line1.setAttribute("y1", "6");
+      line1.setAttribute("x2", "18"); line1.setAttribute("y2", "18");
+
+      line2.setAttribute("x1", "0"); line2.setAttribute("y1", "0");
+      line2.setAttribute("x2", "0"); line2.setAttribute("y2", "0"); // hide middle line
+
+      line3.setAttribute("x1", "6"); line3.setAttribute("y1", "18");
+      line3.setAttribute("x2", "18"); line3.setAttribute("y2", "6");
+    } else {
+      // Sidebar CLOSED → show hamburger
+      line1.setAttribute("x1", "3"); line1.setAttribute("y1", "6");
+      line1.setAttribute("x2", "21"); line1.setAttribute("y2", "6");
+
+      line2.setAttribute("x1", "3"); line2.setAttribute("y1", "12");
+      line2.setAttribute("x2", "21"); line2.setAttribute("y2", "12");
+
+      line3.setAttribute("x1", "3"); line3.setAttribute("y1", "18");
+      line3.setAttribute("x2", "21"); line3.setAttribute("y2", "18");
+    }
+  }
+
+  // Run once on page load
+  updateSidebarIcon();
+
+  // Toggle sidebar
+  sidebarToggle.addEventListener("click", () => {
+    sidebarVisible = !sidebarVisible;
+    
+    if (sidebarVisible) {
+      sidebar.classList.remove("hidden");
+    } else {
+      sidebar.classList.add("hidden");
+    }
+
+    updateSidebarIcon();
+  });
+});
+
 // --- Initialize ---
 (async function init() {
-  await preloadDocs();   // Preload all Markdown
-  buildSidebar();        // Build sidebar with titles
+  await preloadDocs();
+  buildSidebar();
 
-  // Auto-load first document
   const firstItem = sidebarNav.querySelector(".sidebar-item");
   if (firstItem) firstItem.click();
 })();
@@ -113,7 +155,6 @@ const searchInput = document.getElementById("sidebar-search");
 if (searchInput) {
   searchInput.addEventListener("input", () => {
     const query = searchInput.value.toLowerCase().trim();
-
     sidebarNav.querySelectorAll(".sidebar-item").forEach(item => {
       const text = item.textContent.toLowerCase();
       item.style.display = text.includes(query) ? "" : "none";
