@@ -5,7 +5,7 @@ const content = document.querySelector(".content");
 const docs = [
   "docs/Overview.md",
   "docs/LICENSE",
-  "docs/Example-Code.md",
+  "docs/ALU-1001.md",
 ];
 
 // Object to store preloaded content
