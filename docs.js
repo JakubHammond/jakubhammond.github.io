@@ -8,6 +8,7 @@ const docs = [
   "docs/ALU-1001.md",
   "docs/Parameter-design.md",
   "docs/Counter-1001.md",
+  "docs/File-Register-1001.md",
 ];
 
 // Object to store preloaded content
