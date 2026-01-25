@@ -2,6 +2,8 @@
 
 This is the 2nd version of the File Register 1001. This is designed simpler and is more clean and safe.
 
+Writes are visible on the following clock edge; same-cycle reads return old data
+
 This is the SystemVerilog code for File-Register-1002.sv:
 
 ```systemverilog
@@ -319,6 +321,9 @@ this shows the statistics of the design using YoSys verification:
 
 
 ```
+
+The large number of $and and $mux cells corresponds to address decoding and read multiplexing logic derived from the Boolean equations above.
+
 ### ports:
 - clk
 - reset
@@ -327,3 +332,11 @@ this shows the statistics of the design using YoSys verification:
 - wdata[7:0]
 - raddr[2:0]
 - rdata[7:0]
+
+### Design Summary
+- Registers: 8
+- Width: 8 bits each
+- Read ports: 1 (combinational)
+- Write ports: 1 (synchronous)
+- Reset: synchronous, active-high
+- Register 0: hardwired to zero
