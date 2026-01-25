@@ -65,7 +65,7 @@ So we can use R1[0] as an example for a single bit register:
 ```code
 R1[0]_next = (reset) ? 0 : ((we AND (waddr[2:0] == 3'b001)) ? wdata[0] : R1[0]_current)
 ```
-- waddr[2:0] == 3'b001 can be expanded as:
+waddr[2:0] == 3'b001 can be expanded as:
 ```code
 (~waddr[2] AND ~waddr[1] AND waddr[0])
 ```
