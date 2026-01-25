@@ -9,7 +9,8 @@ const docs = [
   "docs/Parameter-design.md",
   "docs/Counter-1001.md",
   "docs/File-Register-1001.md",
-  "docs//File-Register-1002.md",
+  "docs/File-Register-1002.md",
+  "docs/Descriptor-Framework.md",
 ];
 
 // Object to store preloaded content
