@@ -290,3 +290,40 @@ to make the simulation. Next I used:
 ./obj_dir/VRegisterFile
 ```
 to run the simulation.
+---
+## statistics:
+this shows the statistics of the design using YoSys verification:
+```statistics
+11. Printing statistics.
+
+=== RegisterFile ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      137 wires
+      537 wire bits
+       15 public wires
+       89 public wire bits
+        7 ports
+       25 port bits
+      115 cells
+       63   $and
+        8   $dff
+        7   $eq
+        1   $logic_and
+        1   $logic_not
+       33   $mux
+        1   $or
+        1   $reduce_bool
+
+
+
+```
+### ports:
+- clk
+- reset
+- we
+- waddr[2:0]
+- wdata[7:0]
+- raddr[2:0]
+- rdata[7:0]
