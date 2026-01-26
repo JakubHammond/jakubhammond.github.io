@@ -11,6 +11,7 @@ const docs = [
   "docs/File-Register-1001.md",
   "docs/File-Register-1002.md",
   "docs/Descriptor-Framework.md",
+  "docs/Neural-Network-Pruning.md",
 ];
 
 // Object to store preloaded content
