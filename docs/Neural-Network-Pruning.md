@@ -282,3 +282,363 @@ int main() {
 
 ## Overall
 With this, we can use less compute power and have the same results as a full neural network. Especially for large models.
+
+---
+
+## Another Example
+
+This is another example code using my continuous pruning concept.
+
+```cpp
+//
+//  network.cpp
+//  Neural-Network
+//
+//  Created by Jakub Hammond on 1/26/26.
+//
+
+#include <iostream>
+#include <cmath>
+#include <random>
+
+// Define Network
+constexpr int IMG_W = 12;
+constexpr int IMG_H = 12;
+constexpr int INPUT = IMG_W * IMG_H; // 144
+constexpr int HIDDEN = 48;
+constexpr int OUTPUT = 10;
+
+struct Network {
+    double W1[INPUT][HIDDEN];
+    double W2[HIDDEN][OUTPUT];
+
+    bool M1[INPUT][HIDDEN];
+    bool M2[HIDDEN][OUTPUT];
+};
+
+// === Explicit patterns ===
+// Flattened 12x12 matrices for training
+double patterns[OUTPUT][INPUT] = {
+    // 0
+    {
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 1
+    {
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,1,1,1,0,0,0,0,0,0,
+        0,0,1,1,1,1,0,0,0,0,0,0,
+        0,1,1,0,1,1,0,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        1,1,1,1,1,1,1,1,1,1,1,1,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 2
+    {
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,1,1,0,
+        0,0,0,0,0,0,0,0,1,1,0,0,
+        0,0,0,0,0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,1,1,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        1,1,1,1,1,1,1,1,1,1,1,1,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 3
+    {
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,1,1,0,
+        0,0,0,0,0,0,0,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 4
+    {
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,1,1,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,1,1,0,0,0,0,0,0,0,
+        0,0,1,1,0,0,0,0,0,0,0,0,
+        0,1,1,0,0,0,0,0,0,0,0,0,
+        1,1,1,1,1,1,1,1,1,1,1,1,
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 5
+    {
+        1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,0,0,0,0,0,0,0,0,0,0,
+        1,1,0,0,0,0,0,0,0,0,0,0,
+        1,1,0,0,0,0,0,0,0,0,0,0,
+        1,1,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 6
+    {
+        0,0,0,1,1,1,1,1,1,0,0,0,
+        0,0,1,1,0,0,0,0,0,1,1,0,
+        0,1,1,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,0,0,
+        1,1,0,0,0,0,0,0,0,0,0,0,
+        1,1,1,1,1,1,1,1,1,1,0,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 7
+    {
+        1,1,1,1,1,1,1,1,1,1,1,1,
+        0,0,0,0,0,0,0,0,0,1,1,0,
+        0,0,0,0,0,0,0,0,1,1,0,0,
+        0,0,0,0,0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,1,1,0,0,0,0,
+        0,0,0,0,0,1,1,0,0,0,0,0,
+        0,0,0,0,1,1,0,0,0,0,0,0,
+        0,0,0,1,1,0,0,0,0,0,0,0,
+        0,0,1,1,0,0,0,0,0,0,0,0,
+        0,1,1,0,0,0,0,0,0,0,0,0,
+        1,1,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 8
+    {
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    },
+    // 9
+    {
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,1,
+        0,0,1,1,1,1,1,1,1,1,1,1,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        0,0,0,0,0,0,0,0,0,0,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,
+        0,1,1,0,0,0,0,0,0,1,1,0,
+        0,0,1,1,1,1,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0
+    }
+};
+
+// === Helpers ===
+void make_label(int label, double y[OUTPUT]) {
+    for (int i = 0; i < OUTPUT; i++)
+        y[i] = 0.0;
+    y[label] = 1.0;
+}
+
+// Initialization
+double randn() {
+    static std::mt19937 gen(42);
+    static std::normal_distribution<> dist(0.0, 0.1);
+    return dist(gen);
+}
+
+void init(Network& net) {
+    for (int i = 0; i < INPUT; i++)
+        for (int j = 0; j < HIDDEN; j++) {
+            net.W1[i][j] = randn();
+            net.M1[i][j] = true;
+        }
+    for (int i = 0; i < HIDDEN; i++)
+        for (int j = 0; j < OUTPUT; j++) {
+            net.W2[i][j] = randn();
+            net.M2[i][j] = true;
+        }
+}
+
+// Forward pass
+inline double relu(double x) { return x > 0 ? x : 0; }
+
+void forward(Network& net, const double x[INPUT], double hidden[HIDDEN], double out[OUTPUT]) {
+    for (int j = 0; j < HIDDEN; j++) {
+        hidden[j] = 0;
+        for (int i = 0; i < INPUT; i++)
+            if (net.M1[i][j])
+                hidden[j] += x[i] * net.W1[i][j];
+        hidden[j] = relu(hidden[j]);
+    }
+
+    for (int j = 0; j < OUTPUT; j++) {
+        out[j] = 0;
+        for (int i = 0; i < HIDDEN; i++)
+            if (net.M2[i][j])
+                out[j] += hidden[i] * net.W2[i][j];
+    }
+}
+
+// Backprop
+void train_step(Network& net, const double x[INPUT], const double y[OUTPUT], double lr) {
+    double h[HIDDEN], o[OUTPUT];
+    forward(net, x, h, o);
+
+    double dO[OUTPUT];
+    for (int i = 0; i < OUTPUT; i++)
+        dO[i] = 2 * (o[i] - y[i]);
+
+    for (int i = 0; i < HIDDEN; i++)
+        for (int j = 0; j < OUTPUT; j++)
+            if (net.M2[i][j])
+                net.W2[i][j] -= lr * h[i] * dO[j];
+
+    double dH[HIDDEN] = {};
+    for (int i = 0; i < HIDDEN; i++) {
+        for (int j = 0; j < OUTPUT; j++)
+            if (net.M2[i][j])
+                dH[i] += dO[j] * net.W2[i][j];
+        if (h[i] <= 0) dH[i] = 0;
+    }
+
+    for (int i = 0; i < INPUT; i++)
+        for (int j = 0; j < HIDDEN; j++)
+            if (net.M1[i][j])
+                net.W1[i][j] -= lr * x[i] * dH[j];
+}
+
+// Continuous pruning
+void auto_prune(Network& net, double threshold) {
+    for (int i = 0; i < INPUT; i++)
+        for (int j = 0; j < HIDDEN; j++)
+            if (net.M1[i][j] && std::abs(net.W1[i][j]) < threshold)
+                net.M1[i][j] = false;
+
+    for (int i = 0; i < HIDDEN; i++)
+        for (int j = 0; j < OUTPUT; j++)
+            if (net.M2[i][j] && std::abs(net.W2[i][j]) < threshold)
+                net.M2[i][j] = false;
+
+    for (int j = 0; j < HIDDEN; j++) {
+        bool alive = false;
+        for (int i = 0; i < INPUT; i++)
+            if (net.M1[i][j]) alive = true;
+        if (!alive)
+            for (int k = 0; k < OUTPUT; k++)
+                net.M2[j][k] = false;
+    }
+}
+
+// MSE loss
+double mse(const double o[OUTPUT], const double y[OUTPUT]) {
+    double sum = 0.0;
+    for (int i = 0; i < OUTPUT; i++)
+        sum += (o[i] - y[i]) * (o[i] - y[i]);
+    return sum / OUTPUT;
+}
+
+// Stats
+void stats(Network& net) {
+    int active = 0, total = 0;
+    for (int i = 0; i < INPUT; i++)
+        for (int j = 0; j < HIDDEN; j++)
+            static_cast<void>(total++), active += net.M1[i][j];
+    for (int i = 0; i < HIDDEN; i++)
+        for (int j = 0; j < OUTPUT; j++)
+            static_cast<void>(total++), active += net.M2[i][j];
+
+    std::cout << "Active weights: " << active
+              << " / " << total
+              << " (" << 100.0 * active / total << "%)\n";
+}
+
+// Main loop
+int main() {
+    Network net;
+    init(net);
+
+    double x[INPUT];
+    double y[OUTPUT];
+
+    for (int epoch = 0; epoch < 250000; epoch++) {
+        
+        int label = epoch % OUTPUT;
+        
+        make_label(label, y);
+        
+        for (int i = 0; i < INPUT; i++)
+            x[i] = patterns[label][i];
+
+        train_step(net, x, y, 0.01);
+        auto_prune(net, 0.10);
+
+        // Print MSE every 100 epochs
+        if (epoch % 100 == 0) {
+            double h[HIDDEN], o[OUTPUT];
+            forward(net, x, h, o);
+            std::cout << "Epoch " << epoch << ", MSE: " << mse(o, y) << "\n";
+        }
+    }
+
+    stats(net);
+
+    // Evaluation
+    int correct = 0;
+    for (int label = 0; label < OUTPUT; label++) {
+        // Copy pattern into x
+        for (int i = 0; i < INPUT; i++)
+            x[i] = patterns[label][i];
+
+        double h[HIDDEN], o[OUTPUT];
+        forward(net, x, h, o);
+
+        int pred = 0;
+        for (int i = 1; i < OUTPUT; i++)
+            if (o[i] > o[pred]) pred = i;
+
+        if (pred == label) correct++;
+    }
+
+    std::cout << "Accuracy: " << correct << " / " << OUTPUT << "\n";
+}
+```
+This runs 250,000 epochs, but if you like you can set the epochs lower. But it converges at absolute almost 0 after epoch 165,600.
